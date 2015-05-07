@@ -8,7 +8,7 @@
 #import "TiModule.h"
 #import "RebelParseUserProxy.h"
 
-#import <ParseFacebookUtils/PFFacebookUtils.h>
+#import <ParseFacebookUtilsV4/PFFacebookUtils.h>
 #import <FacebookSDK/FacebookSDK.h>
 #import <Parse/Parse.h>
 
@@ -21,7 +21,7 @@
 
 -(void)signup:(id)args;
 -(void)login:(id)args;
--(void)logout;
+-(void)logout:(id)args;
 -(void)resetPassword:(id)args;
 
 -(void)loginWithFacebook:(id)args;

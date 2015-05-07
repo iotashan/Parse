@@ -11,6 +11,4 @@
 
 @interface RebelParseUserProxy : RebelParseObjectProxy
 
-@property(nonatomic,readwrite,assign) PFUser* pfObject;
-
 @end

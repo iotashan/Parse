@@ -2,7 +2,7 @@
 # this is your module manifest and used by Titanium
 # during compilation, packaging, distribution, etc.
 #
-version: 0.1.0
+version: 0.3.0
 apiversion: 2
 description: Parse
 author: Timan Rebel
@@ -14,4 +14,5 @@ name: Parse
 moduleid: rebel.Parse
 guid: e700fd13-7783-4f1c-9201-1442922524fc
 platform: iphone
-minsdk: 3.3.0.GA
+minsdk: 3.5.0.GA
+architectures: armv7 i386 x86_64 arm64

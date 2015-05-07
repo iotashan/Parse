@@ -3,8 +3,6 @@
  */
 #import "RebelParseModuleAssets.h"
 
-extern NSData* filterDataInRange(NSData* thedata, NSRange range);
-
 @implementation RebelParseModuleAssets
 
 - (NSData*) moduleAsset

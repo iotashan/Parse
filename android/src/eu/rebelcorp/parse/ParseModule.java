@@ -103,6 +103,11 @@ public class ParseModule extends KrollModule
         ParseInstallation.getCurrentInstallation().put(key, value);
         ParseInstallation.getCurrentInstallation().saveInBackground();
     }
+	
+    @Kroll.method
+    public String getCurrentInstallationId() {
+        return ParseInstallation.getCurrentInstallation().getInstallationId();
+    }
 
 	public static ParseModule getInstance() {
 		return module;

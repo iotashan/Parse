@@ -39,12 +39,12 @@
 }
 
 #pragma Save functions
--(void)saveObject:(id)args
+-(void)saveObject
 {
    [pfObject save];
 }
 
--(void)saveEventually:(id)args
+-(void)saveEventually
 {
     [pfObject saveEventually];
 }
@@ -82,7 +82,7 @@
 {
     ENSURE_SINGLE_ARG(callback, KrollCallback);
     
-    [pfObject refreshInBackgroundWithBlock:^(PFObject *object, NSError *error) {
+    [pfObject fetchInBackgroundWithBlock:^(PFObject *object, NSError *error) {
         if(callback) {
             NSDictionary* result = [NSDictionary dictionaryWithObjectsAndKeys:error, @"error", nil];
             

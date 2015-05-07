@@ -29,10 +29,10 @@
     // Add your custom code here...
     // Handle the user leaving the app while the Facebook login dialog is being shown
     // For example: when the user presses the iOS "home" button while the login dialog is active
-    [FBAppCall handleDidBecomeActiveWithSession:[PFFacebookUtils session]];
+//    [FBAppCall handleDidBecomeActiveWithSession:[PFFacebookUtils session]];
     
     // Call the 'activateApp' method to log an app event for use in analytics and advertising reporting.
-    [FBAppEvents activateApp];
+    //[FBAppEvents activateApp];
 }
 
 @end
@@ -76,13 +76,13 @@
     NSString *applicationId = [[TiApp tiAppProperties] objectForKey:@"rebel.parse.appId"];
     NSString *clientKey = [[TiApp tiAppProperties] objectForKey:@"rebel.parse.clientKey"];
     
-    NSLog(@"appId: %@", applicationId);
-    NSLog(@"clientKey: %@", clientKey);
+    NSLog(@"[INFO] appId: %@", applicationId);
+    NSLog(@"[INFO] clientKey: %@", clientKey);
     
     [Parse setApplicationId:applicationId
                   clientKey:clientKey];
     
-    [PFFacebookUtils initializeFacebook];
+    [PFFacebookUtils initializeFacebookWithApplicationLaunchOptions:launchOptions];
     
     [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
     
@@ -94,6 +94,7 @@
     // this method is called when the module is first loaded
 	// you *must* call the superclass
 	[super startup];
+    NSLog(@"[INFO] %@ loaded",self);
 }
 
 -(void)shutdown:(id)sender
@@ -105,7 +106,7 @@
 	// you *must* call the superclass
 	[super shutdown:sender];
     
-    [[PFFacebookUtils session] close];
+//    [[PFFacebookUtils session] close];
 }
 
 -(void)resumed:(id)note
@@ -119,9 +120,11 @@
         NSString *sourceApplication = [launchOptions objectForKey:@"source"];
         
         if (urlString != nil) {
+/*
             return [FBAppCall handleOpenURL:[NSURL URLWithString:urlString]
                           sourceApplication:sourceApplication
                                 withSession:[PFFacebookUtils session]];
+*/
         }
     }
     
@@ -169,32 +172,70 @@
 #pragma Authentication
 - (void)signup:(id)args
 {
+    NSDictionary *properties;
+    KrollCallback *callback;
+    
+    ENSURE_ARG_AT_INDEX(properties, args, 0, NSDictionary);
+    ENSURE_ARG_OR_NIL_AT_INDEX(callback, args, 1, KrollCallback);
+    
     PFUser *user = [PFUser user];
-    user.username = @"my name";
-    user.password = @"my pass";
-    user.email = @"email@example.com";
+    user.username = [properties objectForKey:@"username"];
+    user.password = [properties objectForKey:@"password"];
+    user.email = [properties objectForKey:@"email"];
     
     // other fields can be set just like with PFObject
-    user[@"phone"] = @"415-392-0202";
+    for (id key in properties) {
+        user[key] = [properties objectForKey:key];
+    }
     
     [user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
         if (!error) {
-            // Hooray! Let them use the app now.
+            currentUser = [[RebelParseUserProxy alloc]init];
+            currentUser.pfObject = [user retain];
+            if(callback) {
+                NSDictionary* result = [NSDictionary dictionaryWithObjectsAndKeys:currentUser, @"user", nil];
+                
+                [self _fireEventToListener:@"completed" withObject:result listener:callback thisObject:self];
+            }
         } else {
-            NSString *errorString = [error userInfo][@"error"];
-            // Show the errorString somewhere and let the user try again.
+            if(callback) {
+                NSDictionary* result = [NSDictionary dictionaryWithObjectsAndKeys:error, @"error", nil];
+                
+                [self _fireEventToListener:@"completed" withObject:result listener:callback thisObject:self];
+            }
         }
     }];
 }
 
 -(void)login:(id)args
 {
-    [PFUser logInWithUsernameInBackground:@"myname" password:@"mypass"
+    NSLog(@"[INFO] login:(id)args called");
+
+    NSDictionary *properties;
+    KrollCallback *callback;
+    
+    ENSURE_ARG_AT_INDEX(properties, args, 0, NSDictionary);
+    ENSURE_ARG_OR_NIL_AT_INDEX(callback, args, 1, KrollCallback);
+    NSLog(@"[INFO] properties ensured");
+
+    [PFUser logInWithUsernameInBackground:[properties objectForKey:@"username"] password:[properties objectForKey:@"password"]
                                     block:^(PFUser *user, NSError *error) {
                                         if (user) {
-                                            // Do stuff after successful login.
+                                            NSLog(@"[INFO] PFUser returned");
+                                            currentUser = [[RebelParseUserProxy alloc]init];
+                                            currentUser.pfObject = [user retain];
+                                            if(callback) {
+                                                NSDictionary* result = [NSDictionary dictionaryWithObjectsAndKeys:currentUser, @"user", nil];
+                                                
+                                                [self _fireEventToListener:@"completed" withObject:result listener:callback thisObject:self];
+                                            }
                                         } else {
-                                            // The login failed. Check error to see why.
+                                            NSLog(@"[ERROR] Uh oh. An error occurred: %@", error);
+                                            if(callback) {
+                                                NSDictionary* result = [NSDictionary dictionaryWithObjectsAndKeys:error, @"error", nil];
+                                                
+                                                [self _fireEventToListener:@"completed" withObject:result listener:callback thisObject:self];
+                                            }
                                         }
                                     }];
 }
@@ -221,6 +262,13 @@
     return currentUser;
 }
 
+#pragma Installation
+-(id)currentInstallationId {
+    PFInstallation *currentInstallation = [PFInstallation currentInstallation];
+    
+    return [currentInstallation installationId];
+}
+
 #pragma Facebook
 // Login PFUser using Facebook
 -(void)loginWithFacebook:(id)args
@@ -231,32 +279,33 @@
     ENSURE_ARG_AT_INDEX(permissions, args, 0, NSArray);
     ENSURE_ARG_OR_NIL_AT_INDEX(callback, args, 1, KrollCallback);
     
-    [PFFacebookUtils logInWithPermissions:permissions block:^(PFUser *user, NSError *error) {
+    [PFFacebookUtils logInInBackgroundWithReadPermissions:permissions block:^(PFUser *user, NSError *error) {
         
         if (!user) {
             NSString *errorMessage = nil;
             if (!error) {
-                NSLog(@"Uh oh. The user cancelled the Facebook login.");
+                if(callback) {
+                    NSDictionary* result = [NSDictionary dictionaryWithObjectsAndKeys:true, @"canceled", nil];
+                    
+                    [self _fireEventToListener:@"completed" withObject:result listener:callback thisObject:self];
+                }
                 
             } else {
-                NSLog(@"Uh oh. An error occurred: %@", error);
-                errorMessage = [error localizedDescription];
-                
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Log In Error"
-                                                                message:errorMessage
-                                                               delegate:nil
-                                                      cancelButtonTitle:nil
-                                                      otherButtonTitles:@"Dismiss", nil];
-                [alert show];
+                NSLog(@"[ERROR] Uh oh. An error occurred: %@", error);
+                if(callback) {
+                    NSDictionary* result = [NSDictionary dictionaryWithObjectsAndKeys:error, @"error", nil];
+                    
+                    [self _fireEventToListener:@"completed" withObject:result listener:callback thisObject:self];
+                }
             }
         } else {
             if (user.isNew) {
-                NSLog(@"User with facebook signed up and logged in!");
+                NSLog(@"[INFO] User with facebook signed up and logged in!");
             } else {
-                NSLog(@"User with facebook logged in!");
+                NSLog(@"[INFO] User with facebook logged in!");
             }
             
-            RebelParseUserProxy *currentUser = [[RebelParseUserProxy alloc]init];
+            currentUser = [[RebelParseUserProxy alloc]init];
             currentUser.pfObject = [user retain];
             
             if(callback) {
@@ -274,35 +323,7 @@
     
     ENSURE_ARG_AT_INDEX(accessTokenData, args, 0, NSDictionary);
     
-    [PFFacebookUtils logInWithFacebookId:[accessTokenData objectForKey:@"facebookId"]
-                            accessToken:[accessTokenData objectForKey:@"accessToken"]
-                            expirationDate:[accessTokenData objectForKey:@"expirationDate"]
-                                   block: ^(PFUser *user, NSError *error) {
-                                       
-       if (!user) {
-           NSString *errorMessage = nil;
-           if (!error) {
-               NSLog(@"Uh oh. The user cancelled the Facebook login.");
-               
-           } else {
-               NSLog(@"Uh oh. An error occurred: %@", error);
-               errorMessage = [error localizedDescription];
-               
-               UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Log In Error"
-                                                               message:errorMessage
-                                                              delegate:nil
-                                                     cancelButtonTitle:nil
-                                                     otherButtonTitles:@"Dismiss", nil];
-               [alert show];
-           }
-       } else {
-           if (user.isNew) {
-               NSLog(@"User with facebook signed up and logged in!");
-           } else {
-               NSLog(@"User with facebook logged in!");
-           }
-       }
-   }];
+    NSLog(@"[ERROR] loginWithFacebookAccessTokenData has not been re-implamented using the 4.0 SDK")
 }
 
 #pragma Cloud functions
