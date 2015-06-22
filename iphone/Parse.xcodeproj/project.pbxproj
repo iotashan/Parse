@@ -46,10 +46,8 @@
 		BCE1EBF919B5E72D00ECF758 /* RebelParseObjectProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = BCE1EBF719B5E72D00ECF758 /* RebelParseObjectProxy.m */; };
 		BCE1EBFE19B61A2000ECF758 /* RebelParseQueryProxy.h in Headers */ = {isa = PBXBuildFile; fileRef = BCE1EBFC19B61A2000ECF758 /* RebelParseQueryProxy.h */; };
 		BCE1EBFF19B61A2000ECF758 /* RebelParseQueryProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = BCE1EBFD19B61A2000ECF758 /* RebelParseQueryProxy.m */; };
-		D91172031AFA38F300112645 /* FBSDKCoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91172021AFA38F300112645 /* FBSDKCoreKit.framework */; };
 		D91172071AFA390800112645 /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91172061AFA390800112645 /* Parse.framework */; };
 		D91172091AFA391700112645 /* ParseCrashReporting.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D91172081AFA391700112645 /* ParseCrashReporting.framework */; };
-		D911720B1AFA392300112645 /* ParseFacebookUtilsV4.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D911720A1AFA392300112645 /* ParseFacebookUtilsV4.framework */; };
 		D911720D1AFA392B00112645 /* ParseUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D911720C1AFA392A00112645 /* ParseUI.framework */; };
 /* End PBXBuildFile section */
 
@@ -90,10 +88,8 @@
 		BCE1EBFC19B61A2000ECF758 /* RebelParseQueryProxy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RebelParseQueryProxy.h; path = Classes/RebelParseQueryProxy.h; sourceTree = "<group>"; };
 		BCE1EBFD19B61A2000ECF758 /* RebelParseQueryProxy.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RebelParseQueryProxy.m; path = Classes/RebelParseQueryProxy.m; sourceTree = "<group>"; };
 		D2AAC07E0554694100DB518D /* libRebelParse.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRebelParse.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		D91172021AFA38F300112645 /* FBSDKCoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FBSDKCoreKit.framework; path = platform/FBSDKCoreKit.framework; sourceTree = "<group>"; };
 		D91172061AFA390800112645 /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Parse.framework; path = platform/Parse.framework; sourceTree = "<group>"; };
 		D91172081AFA391700112645 /* ParseCrashReporting.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ParseCrashReporting.framework; path = platform/ParseCrashReporting.framework; sourceTree = "<group>"; };
-		D911720A1AFA392300112645 /* ParseFacebookUtilsV4.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ParseFacebookUtilsV4.framework; path = platform/ParseFacebookUtilsV4.framework; sourceTree = "<group>"; };
 		D911720C1AFA392A00112645 /* ParseUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ParseUI.framework; path = platform/ParseUI.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -103,10 +99,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				D911720D1AFA392B00112645 /* ParseUI.framework in Frameworks */,
-				D911720B1AFA392300112645 /* ParseFacebookUtilsV4.framework in Frameworks */,
 				D91172091AFA391700112645 /* ParseCrashReporting.framework in Frameworks */,
 				D91172071AFA390800112645 /* Parse.framework in Frameworks */,
-				D91172031AFA38F300112645 /* FBSDKCoreKit.framework in Frameworks */,
 				BCE1EBE119B5C03400ECF758 /* SystemConfiguration.framework in Frameworks */,
 				BCE1EBDF19B5C02F00ECF758 /* StoreKit.framework in Frameworks */,
 				BCE1EBDD19B5C02B00ECF758 /* Security.framework in Frameworks */,
@@ -148,10 +142,8 @@
 			isa = PBXGroup;
 			children = (
 				D911720C1AFA392A00112645 /* ParseUI.framework */,
-				D911720A1AFA392300112645 /* ParseFacebookUtilsV4.framework */,
 				D91172081AFA391700112645 /* ParseCrashReporting.framework */,
 				D91172061AFA390800112645 /* Parse.framework */,
-				D91172021AFA38F300112645 /* FBSDKCoreKit.framework */,
 				BCE1EBE019B5C03400ECF758 /* SystemConfiguration.framework */,
 				BCE1EBDE19B5C02F00ECF758 /* StoreKit.framework */,
 				BCE1EBDC19B5C02B00ECF758 /* Security.framework */,

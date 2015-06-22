@@ -13,6 +13,8 @@
 
 #import "JRSwizzle.h"
 
+NSString *const BFTaskMultipleExceptionsException = @"BFMultipleExceptionsException";
+
 // Create a category which adds new methods to TiApp
 @implementation TiApp (Facebook)
 
@@ -82,7 +84,7 @@
     [Parse setApplicationId:applicationId
                   clientKey:clientKey];
     
-    [PFFacebookUtils initializeFacebookWithApplicationLaunchOptions:launchOptions];
+//    [PFFacebookUtils initializeFacebookWithApplicationLaunchOptions:launchOptions];
     
     [PFAnalytics trackAppOpenedWithLaunchOptions:launchOptions];
     
@@ -170,6 +172,21 @@
 }
 
 #pragma Authentication
+-(void)authenticate:(id)sessionToken
+{
+    ENSURE_SINGLE_ARG(sessionToken, NSString);
+    
+    [PFUser becomeInBackground:sessionToken block:^(PFUser *user, NSError *error){
+        if (!error) {
+            NSLog(@"[INFO] PFUser returned");
+            currentUser = [[RebelParseUserProxy alloc]init];
+            currentUser.pfObject = [user retain];
+        } else {
+            NSLog(@"[ERROR] Uh oh. An error occurred: %@", error);
+        }
+    }];
+}
+
 - (void)signup:(id)args
 {
     NSDictionary *properties;
@@ -269,6 +286,7 @@
     return [currentInstallation installationId];
 }
 
+/*
 #pragma Facebook
 // Login PFUser using Facebook
 -(void)loginWithFacebook:(id)args
@@ -325,6 +343,7 @@
     
     NSLog(@"[ERROR] loginWithFacebookAccessTokenData has not been re-implamented using the 4.0 SDK")
 }
+*/
 
 #pragma Cloud functions
 -(void)callFunction:(id)args
@@ -387,7 +406,7 @@
     
     // Store the deviceToken in the current Installation and save it to Parse.
     PFInstallation *currentInstallation = [PFInstallation currentInstallation];
-    [currentInstallation setDeviceTokenFromData:[deviceToken dataUsingEncoding:NSUTF8StringEncoding]];
+    [currentInstallation setDeviceTokenFromData:deviceToken];
     [currentInstallation saveInBackground];
 }
 
@@ -412,6 +431,15 @@
 -(NSArray *)getChannels:(id)args
 {
     return [PFInstallation currentInstallation].channels;
+}
+
+-(void)resetBadgeCount:(id)count
+{
+    ENSURE_SINGLE_ARG(count, NSNumber);
+    
+    PFInstallation *currentInstallation = [PFInstallation currentInstallation];
+    currentInstallation.badge = 0;
+    [currentInstallation saveEventually];
 }
 
 @end

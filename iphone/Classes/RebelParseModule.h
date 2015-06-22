@@ -8,8 +8,6 @@
 #import "TiModule.h"
 #import "RebelParseUserProxy.h"
 
-#import <ParseFacebookUtilsV4/PFFacebookUtils.h>
-#import <FacebookSDK/FacebookSDK.h>
 #import <Parse/Parse.h>
 
 @interface RebelParseModule : TiModule {
@@ -17,14 +15,12 @@
     RebelParseUserProxy* currentUser;
 }
 
-
-
+-(void)authenticate:(id)args;
 -(void)signup:(id)args;
 -(void)login:(id)args;
 -(void)logout:(id)args;
 -(void)resetPassword:(id)args;
 
--(void)loginWithFacebook:(id)args;
 -(void)callFunction:(id)args;
 
 @end
