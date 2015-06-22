@@ -16,6 +16,8 @@ import java.util.Set;
 import org.appcelerator.kroll.KrollDict;
 import org.appcelerator.titanium.TiApplication;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +28,9 @@ import com.parse.ParsePushBroadcastReceiver;
 
 
 public class ParseModuleBroadcastReceiver extends ParsePushBroadcastReceiver {
+    
+    NotificationManager mNotificationManager;
+    int notification_id = 0;
 
     @Override
     public void onPushOpen(Context context, Intent intent) {
@@ -49,7 +54,7 @@ public class ParseModuleBroadcastReceiver extends ParsePushBroadcastReceiver {
     
     @Override
     public void onReceive(Context context, Intent intent) {
-//        super.onReceive(context, intent);
+        mNotificationManager = (NotificationManager) context.getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
         
         try {
             if (intent == null) {
@@ -94,5 +99,17 @@ public class ParseModuleBroadcastReceiver extends ParsePushBroadcastReceiver {
         
         super.onReceive(context, intent);
         
+    }
+
+    @Override
+    protected Notification getNotification(Context context, Intent intent) {
+        if(ParseModule.getInstance() != null) {
+            mNotificationManager.cancel(notification_id);
+        } else {
+            Notification n = super.getNotification(context, intent);
+            //        int type = intent.getExtras().getInt("NOTIFICATION_TYPE");
+            mNotificationManager.notify(notification_id, n);
+        }
+        return null;
     }
 }
